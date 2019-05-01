@@ -5,6 +5,9 @@ var mongoose = require('mongoose');
 var Campground = require('./models/campground');
 var Comment = require('./models/comment');
 var seedDB = require('./seeds');
+var passport = require("passport");
+var LocalStrategy = require("passport-local");
+var User = require("./models/user");
 
 seedDB();
 
@@ -13,31 +16,25 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
+app.use(require("express-session")({
+    secret: "Here I am",
+    resave: false,
+    saveUnitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
-/*Campground.create({
-        name:"Chrea",
-        image:"https://cdn130.picsart.com/272387947050201.jpg?r1024x1024",
-        description: "A nice place full of nice people, but there isn't a bathroom !"
-    },
-    function (err, campground) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log("NEWLY CREATED CAMPGROUND :");
-            console.log(campground);
-        }
-    }
-)*/
-
-/*var  campgrounds = [
-    {name:"Chrea", image:"https://cdn130.picsart.com/272387947050201.jpg?r1024x1024"},
-    {name:"Aures", image:"https://cdn141.picsart.com/269456048005201.jpg?r1024x1024"},
-    {name:"Kalla", image:"https://cdn141.picsart.com/271673218033201.jpg?r1024x1024"},
-];*/
+app.use(function (req, res, next) {
+    res.locals.currentUser = req.user;
+    next();
+})
 
 app.get("/", function (req, res) {
     res.render("landing");
-})
+});
 
 app.get("/campgrounds", function (req, res) {
     Campground.find({}, function (err, allCampgrounds) {
@@ -47,7 +44,7 @@ app.get("/campgrounds", function (req, res) {
             res.render("campground/index", {campgrounds : allCampgrounds});
         }
     })
-})
+});
 
 app.post("/campgrounds", function (req, res) {
     //res.send("YOU HIT THE POST ROUTE !");
@@ -62,12 +59,11 @@ app.post("/campgrounds", function (req, res) {
             res.redirect("/campgrounds");
         }
     })
-    //campgrounds.push(newCampground);
-})
+});
 
-app.get("/campgrounds/new", function (req, res) {
+app.get("/campgrounds/new", isLoggedIn, function (req, res) {
     res.render("campground/new");
-})
+});
 
 app.get("/campgrounds/:id", function (req, res) {
     Campground.findById(req.params.id).populate("comments").exec(function (err, foundCampground) {
@@ -78,9 +74,9 @@ app.get("/campgrounds/:id", function (req, res) {
             res.render("campground/show", {campground: foundCampground});
         }
     })
-})
+});
 
-app.get("/campgrounds/:id/comments/new", function (req, res) {
+app.get("/campgrounds/:id/comments/new", isLoggedIn, function (req, res) {
     Campground.findById(req.params.id, function (err, campground) {
         if (err) {
             console.log(err);
@@ -88,9 +84,9 @@ app.get("/campgrounds/:id/comments/new", function (req, res) {
             res.render("comment/new", {campground: campground});
         }
     })  
-})
+});
 
-app.post("/campgrounds/:id/comments", function(req, res) {
+app.post("/campgrounds/:id/comments", isLoggedIn, function(req, res) {
     Campground.findById(req.params.id, function (err, campground) {
         if (err) {
             console.log(err);
@@ -110,8 +106,49 @@ app.post("/campgrounds/:id/comments", function(req, res) {
             })
         }
     })
-})
+});
+
+//AUTH ROUTES
+//show register form
+app.get("/register", function(req, res) {
+    res.render("register");
+});
+//handle sign up logic
+app.post("/register", function(req, res) {
+    var newUser = new User({username: req.body.username});
+    User.register(newUser, req.body.password, function (err, user) {
+       if (err) {
+           console.log(err);
+           return res.render("register");
+       }
+       passport.authenticate("local")(req, res, function () {
+           res.redirect("/campgrounds"); 
+       });
+    });
+});
+//show login form
+app.get("/login", function (req, res) {
+    res.render("login");
+});
+//handle login logic
+app.post("/login", passport.authenticate("local", 
+{
+    successRedirect: "/campgrounds",
+    failureRedirect: "/login"
+}), function (req, res) {
+});
+//logout route
+app.get("/logout", function (req, res) {
+    req.logout();
+    res.redirect("/campgrounds");
+});
+function isLoggedIn(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next;
+    }
+    res.redirect("/login");
+};
 
 app.listen('3000', function () {
-    console.log("HERE WE GO !!!");
-})
+    console.log("YELP CAMP ..."); 
+});

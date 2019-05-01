@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Yelp Camp</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-        <link rel="stylesheet" href="/stylesheets/main.css">
-    </head>
-    <body>
+
+<head>
+    <title>Yelp Camp</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+</head>
+
+<body>
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
@@ -14,20 +17,27 @@
                     <a class="navbar-brand" href="/">Yelp Camp</a>
                 </div>
             </div>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarToggler" style="width: 40%">
                 <ul class="nav navbar-nav navbar-right">
+                    <% if (!currentUser) { %>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Log in <i class="fas fa-user-check"></i></a>
+                        <a class="nav-link" href="/login">Log in <i class="fas fa-user-check"></i></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Log out <i class="fas fa-user-slash"></i></a>
+                        <a class="nav-link" href="/register">Sign up <i class="fas fa-user-plus"></i></a>
+                    </li>
+                    <% } else { %>
+                    <li class="nav-item">
+                        <a class="nav-link">Signed In As <%= currentUser.username %></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Sign up <i class="fas fa-user-plus"></i></a>
+                        <a class="nav-link" href="/logout">Log out <i class="fas fa-user-slash"></i></a>
                     </li>
+                    <% } %>
                 </ul>
             </div>
         </div>
