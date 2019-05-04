@@ -31,6 +31,7 @@ function seedDB() {
                         } else {
                             data.comments.push(comment);
                             data.save();
+                            console.log(comment.text);
                             console.log("Created new comment !");
                         }
                     });
