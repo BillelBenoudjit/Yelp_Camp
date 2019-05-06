@@ -29,10 +29,11 @@ function seedDB() {
                         if (err) {
                             console.log(err);
                         } else {
+                            comment.save();
                             data.comments.push(comment);
                             data.save();
-                            console.log(comment.text);
-                            console.log("Created new comment !");
+                            /*console.log(comment.text);
+                            console.log("Created new comment !");*/
                         }
                     });
                 }
