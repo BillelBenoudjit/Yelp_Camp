@@ -7,6 +7,7 @@ var Comment = require('./models/comment');
 var seedDB = require('./seeds');
 var passport = require("passport");
 var LocalStrategy = require("passport-local");
+var methodOverride = require("method-override");
 var User = require("./models/user");
 var campgroundRoutes = require("./routes/campgrounds");
 var commentRoutes = require("./routes/comments");
@@ -18,6 +19,7 @@ mongoose.connect("mongodb://localhost/yelp_camp" , { useNewUrlParser: true });
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.set("view engine", "ejs");
+app.use(methodOverride("_method"));
 app.use(express.static(__dirname + "/public"));
 app.use(require("express-session")({
     secret: "Here I am",
