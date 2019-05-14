@@ -13,7 +13,7 @@ var campgroundRoutes = require("./routes/campgrounds");
 var commentRoutes = require("./routes/comments");
 var authRoutes = require("./routes/auth");
 
-seedDB();
+//seedDB();
 
 mongoose.connect("mongodb://localhost/yelp_camp" , { useNewUrlParser: true });
 app.use(bodyParser.urlencoded({ extended: false }));
